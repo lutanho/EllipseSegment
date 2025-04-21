@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CSS Ellipse Segment</title>
+<style>
+body:  { margin:0px; }
+.grid  { margin-left:0px; margin-top:0px; padding:0px; background-color:#fff; font-family:Courier; background-image:
+         repeating-linear-gradient( 90deg, #ccc 0px, #ccc 1px, transparent 1px, transparent 10px),
+         repeating-linear-gradient(180deg, #ccc 0px, #ccc 1px, transparent 1px, transparent 10px); }
+canvas { width:800px; height:600px; border: 0px }
+th     { font-faily:Arial;font-size:24px;cursor:pointer; border-radius:12px}
+td     { font-faily:Arial;font-size:24px;vertical-align:top}
+pre    { font-size:16px; }
+</style>
+</head>
+<body class='grid' onload='Draw()'>
+<table border=0 cellpadding=0 cellspacing=0><tr><td colspan=3><canvas id="canvas" width=800 height=600 border=0></canvas></td>
+<td rowspan=2 style='width:20px'></td><td rowspan=2>
+<br>CSS Ellipse Segment DIV<br><br>
+skewed <input id='w' oninput='UpdE(this.value)' type='range' value='0' min='0' max='1' step='1' style='width:40px;'>rotateded<br><br>
+borderWidth: <input id='lw' oninput='UpdB2(this.value)' type='range' value='20' min='1' max='40' step='1' style='width:100px;'><br><br>
+<br>
+<pre>
+//Author: Lutz Tautenhahn 
+//https://www.lutanho.net
+
+//License: Apache License, Version 2.0
+</pre>
+</td>
+</tr><tr>
+<th id='s0' style='color:#f00;background-color:#ccc' onclick='Sel(0)'>A</th>
+<th id='s1' style='color:#080;background-color:#999' onclick='Sel(1)'>X</th>
+<th id='s2' style='color:#00f;background-color:#ccc' onclick='Sel(2)'>B</th></tr></table>
+<div id='s_ellipse' onclick='sEllipseClick()' style='cursor:pointer;position:absolute;left:0px;top:0px;width:80px;height:80px;transform-origin:0% 0%; border-right:20px solid #080c; border-bottom:20px solid #080c; border-radius:0% 0% 100% 0%;'></div>
+<div id='r_ellipse' onclick='rEllipseClick()' style='cursor:pointer;position:absolute;left:0px;top:0px;width:80px;height:80px;transform-origin:50% 50%; border-radius:50% 50% 50% 50%; border:20px solid #080c;'></div>
+<div id='s_container'></div>
+<div id='r_container'></div>
+<script>
+function el(id) { return(document.getElementById(id)); }
+const canvas=el("canvas");
+const ctx=canvas.getContext("2d");
+canvas.addEventListener("click", handleClick);
+var sel=1, Ax=350, Ay=150, Ix=500, Iy=100, Bx=450, By=250, E=0, B2=10;
+function sEllipseClick() { alert("You clicked on  skewed css ellipse segment div."); }
+function rEllipseClick() { alert("You clicked on  rotated css ellipse segment div."); }
+function UpdE(vv)
+{ E=parseInt(vv);
+  Draw();
+}
+function UpdB2(vv)
+{ var ww=parseInt(vv);
+  B2=ww/2;
+  Draw();
+}
+function Sel(ii)
+{ if (sel==ii) return;
+  el('s'+sel).style.backgroundColor='#ccc';
+  sel=ii;
+  el('s'+sel).style.backgroundColor='#999';
+  Draw();
+}
+function handleClick(event)
+{ if (sel==0)
+  { Ax=event.offsetX;
+    Ay=event.offsetY;
+  }
+  if (sel==1)
+  { Ix=event.offsetX;
+    Iy=event.offsetY;
+  }
+  if (sel==2)
+  { Bx=event.offsetX;
+    By=event.offsetY;
+  }  
+  Draw();
+}
+
+function Draw()
+{ var Ox=Ax+Bx-Ix;
+  var Oy=Ay+By-Iy;
+  var ax=Ax-Ox;
+  var ay=Ay-Oy;
+  var bx=Bx-Ox;
+  var by=By-Oy;
+  var lA,lB, tA, tB, tt, sin_t, cos_t;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth=3;
+  
+  lA=Math.sqrt(ax*ax+ay*ay);
+  lB=Math.sqrt(bx*bx+by*by);
+  tA=Math.atan(ax/ay);
+  if (ay<0) tA+=Math.PI;
+  tB=Math.atan(bx/by);
+  if (by<0) tB+=Math.PI;
+   
+  ctx.strokeStyle="#444";
+  ctx.beginPath();
+  ctx.moveTo(Ix, Iy);
+  ctx.lineTo(Ix+2*(Bx-Ix), Iy+2*(By-Iy));
+  ctx.lineTo(Ix+2*(Ax-Ix)+2*(Bx-Ix), Iy+2*(Ay-Iy)+2*(By-Iy));
+  ctx.lineTo(Ix+2*(Ax-Ix), Iy+2*(Ay-Iy));
+  ctx.lineTo(Ix, Iy);
+  ctx.stroke(); 
+  
+  ctx.fillStyle="#f00";
+  ctx.fillRect(Ax-5,Ay-5,10,10);
+  ctx.fillStyle="#080";
+  ctx.fillRect(Ix-5,Iy-5,10,10);
+  ctx.fillStyle="#00f";
+  ctx.fillRect(Bx-5,By-5,10,10);
+  ctx.fillStyle="#000";
+  ctx.fillRect(Ox-5,Oy-5,10,10);
+  
+  ctx.strokeStyle="#4044";
+  ctx.beginPath();
+  ctx.moveTo(Ox+ax, Oy+ay); 
+  for (tt=3; tt<=360; tt+=3)
+  { sin_t=Math.sin(tt*Math.PI/180);
+    cos_t=Math.cos(tt*Math.PI/180);
+    ctx.lineTo(Ox+cos_t*ax+sin_t*bx, Oy+cos_t*ay+sin_t*by); 
+  } 
+  ctx.stroke();
+  
+  ctx.lineWidth=7;
+  ctx.strokeStyle="#000";
+  CanvasDrawEllipseSegment(ctx, Ax, Ay, Bx, By, Ix, Iy);
+  ctx.lineWidth=3;
+  ctx.strokeStyle="#4044";
+  
+  if ((ax*ax+ay*ay)-(bx*bx+by*by)==0) tt=Math.PI/4;
+  else tt=Math.atan(2*(ax*bx+ay*by)/((ax*ax+ay*ay)-(bx*bx+by*by)))/2;
+  
+  sin_t=Math.sin(tt);
+  cos_t=Math.cos(tt);
+
+  ctx.beginPath();
+  ctx.moveTo(Ox-cos_t*ax-sin_t*bx, Oy-cos_t*ay-sin_t*by); 
+  ctx.lineTo(Ox+cos_t*ax+sin_t*bx, Oy+cos_t*ay+sin_t*by);
+  ctx.stroke();
+  
+  tt+=Math.PI/2;
+  
+  sin_t=Math.sin(tt);
+  cos_t=Math.cos(tt);
+
+  ctx.beginPath();
+  ctx.moveTo(Ox-cos_t*ax-sin_t*bx, Oy-cos_t*ay-sin_t*by); 
+  ctx.lineTo(Ox+cos_t*ax+sin_t*bx, Oy+cos_t*ay+sin_t*by);
+  ctx.stroke();
+ 
+  el('r_ellipse').style.display='none';  
+  if (E) el('r_container').innerHTML=RotatedEllipseSegment(Ax, Ay, Bx, By, Ix, Iy, "#080c", 2*B2);
+  else el('r_container').innerHTML="";
+ 
+  el('s_ellipse').style.display='none';
+  if (E) el('s_container').innerHTML="";
+  else el('s_container').innerHTML=SkewedEllipseSegment(Ax, Ay, Bx, By, Ix, Iy, "#080c", 2*B2);
+}
+function CanvasDrawEllipseSegment(ctx, Ax, Ay, Bx, By, Ix, Iy)
+{ //context, point A, point B, intersection I of tangent lines
+  var Ox=Ax+Bx-Ix, Oy=Ay+By-Iy, ax=Ax-Ox, ay=Ay-Oy, bx=Bx-Ox, by=By-Oy;
+  var lA,lB, tA, tB, tt, sin_t, cos_t;
+  lA=Math.sqrt(ax*ax+ay*ay);
+  lB=Math.sqrt(bx*bx+by*by);
+  tA=Math.atan(ax/ay);
+  if (ay<0) tA+=Math.PI;
+  tB=Math.atan(bx/by);
+  if (by<0) tB+=Math.PI;
+  ctx.beginPath();
+  ctx.moveTo(Ox+ax, Oy+ay);
+  for (tt=3; tt<=90; tt+=3) //for entire ellipse use tt<=360
+  { sin_t=Math.sin(tt*Math.PI/180);
+    cos_t=Math.cos(tt*Math.PI/180);
+    ctx.lineTo(Ox+cos_t*ax+sin_t*bx, Oy+cos_t*ay+sin_t*by);
+  }
+  ctx.stroke();
+}
+function SkewedEllipseSegment(X1, Y1, X2, Y2, XI, YI, Color, Size)
+{ var ax=XI-X2;
+  var ay=YI-Y2;
+  var bx=XI-X1;
+  var by=YI-Y1;
+  var W=Math.sqrt(ax*ax+ay*ay);
+  var H=Math.sqrt(bx*bx+by*by);
+  var ootext="<div onclick='sEllipseClick()' style='cursor:pointer;position:absolute;left:"+(X1+X2-XI)+"px;top:"+(Y1+Y2-YI)+"px; width:"+(W-Size/2)+"px; height:"+(H-Size/2)+"px;transform-origin:0% 0%; border-right:"+(Size)+"px solid "+(Color)+"; border-bottom:"+(Size)+"px solid "+(Color)+"; border-radius:0% 0% 100% 0%;transform:matrix("+(ax/W)+","+(ay/W)+","+(bx/H)+","+(by/H)+",0,0);";
+  ootext+="clip-path:polygon(100% 100%, 0% 100%";
+  for (var nn=0; nn<=90; nn+=15)
+    ootext+=", "+(Math.sin(nn*Math.PI/180)*(100-100*Size/W))+"% "+(Math.cos(nn*Math.PI/180)*(100-100*Size/H))+"%";
+  ootext+=", 100% 0%);";
+  ootext+="'></div>";
+  return(ootext);
+}
+function RotatedEllipseSegment(X1, Y1, X2, Y2, XI, YI, Color, Size)
+{ var ax=XI-X2;
+  var ay=YI-Y2;
+  var bx=XI-X1;
+  var by=YI-Y1;
+  var B2=Size/2;
+  var tt=Math.atan(2*(ax*bx+ay*by)/((ax*ax+ay*ay)-(bx*bx+by*by)))/2;
+  var sin_t=Math.sin(tt);
+  var cos_t=Math.cos(tt);
+  var W2=Math.sqrt((cos_t*ax+sin_t*bx)*(cos_t*ax+sin_t*bx)+(cos_t*ay+sin_t*by)*(cos_t*ay+sin_t*by));
+  tt+=Math.PI/2;
+  sin_t=Math.sin(tt);
+  cos_t=Math.cos(tt);
+  var H2=Math.sqrt((cos_t*ax+sin_t*bx)*(cos_t*ax+sin_t*bx)+(cos_t*ay+sin_t*by)*(cos_t*ay+sin_t*by));
+  var T=Math.atan((cos_t*ax+sin_t*bx)/(cos_t*ay+sin_t*by));  
+  var ootext="<div onclick='rEllipseClick()' style='cursor:pointer;position:absolute;left:"+(X1+X2-XI-W2-B2)+"px;top:"+(Y1+Y2-YI-H2-B2)+"px; width:"+(2*W2-Size)+"px; height:"+(2*H2-Size)+"px;transform-origin:50% 50%; border:"+(Size)+"px solid "+(Color)+"; border-radius:50% 50% 50% 50%;transform:rotate("+(-T*180/Math.PI)+"deg);";
+  var lA=Math.sqrt(ax*ax+ay*ay);
+  var lB=Math.sqrt(bx*bx+by*by);
+  var tA=Math.atan(ax/ay);
+  if (ay<0) tA+=Math.PI;
+  var tB=Math.atan(bx/by);
+  if (by<0) tB+=Math.PI;  
+  var xx, yy, ttA, ttB;
+  xx=Math.sin(tA-T)/W2;
+  yy=Math.cos(tA-T)/H2;
+  ttA=Math.atan(xx/yy);
+  if (yy<0) ttA+=Math.PI;
+  xx=Math.sin(tB-T)/W2;
+  yy=Math.cos(tB-T)/H2;
+  ttB=Math.atan(xx/yy);
+  if (yy<0) ttB+=Math.PI;  
+  if (ax*by-ay*bx>0) { if (ttA<ttB) ttA+=2*Math.PI;  }
+  else { if (ttB<ttA) ttB+=2*Math.PI; }  
+  var nn, ppoly="";
+  for (nn=0; nn<=12; nn++)
+    ppoly+=","+(100*((W2+B2+(W2+2*B2)*Math.sin(ttA+nn/12*(ttB-ttA)))/(2*W2+2*B2)))+"% "+(100*((H2+B2+(H2+2*B2)*Math.cos(ttA+nn/12*(ttB-ttA)))/(2*H2+2*B2)))+"%";
+  for (nn=12; nn>=0; nn--)
+    ppoly+=","+(100*((W2+B2+(W2-B2)*Math.sin(ttA+nn/12*(ttB-ttA)))/(2*W2+2*B2)))+"% "+(100*((H2+B2+(H2-B2)*Math.cos(ttA+nn/12*(ttB-ttA)))/(2*H2+2*B2)))+"%";
+  ppoly=ppoly.substr(1); 
+  ootext+="clip-path:polygon("+ppoly+");";
+  ootext+="'></div>";
+  return(ootext);
+}
+</script>
+</body>
+</html>
